@@ -1,6 +1,9 @@
 package storage;
 
 public class Repository {
-    public int id;
     public String link;
+
+    public Repository(final String link) {
+        this.link = link;
+    }
 }

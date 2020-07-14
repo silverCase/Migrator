@@ -7,13 +7,13 @@ public class Commit {
     public String developerName;
     public String commitDate;
     public String commitText;
-    public ArrayList<CommitFiles> filePath = new ArrayList<CommitFiles>();
+    public ArrayList<CommitFiles> commitFiles = new ArrayList<CommitFiles>();
 
-    public Commit(String commitID, String developerName, String commitDate, String commitText, ArrayList<CommitFiles> filePath) {
+    public Commit(String commitID, String developerName, String commitDate, String commitText, ArrayList<CommitFiles> commitFiles) {
         this.commitID = commitID;
         this.developerName = developerName;
         this.commitDate = commitDate;
         this.commitText = commitText;
-        this.filePath.addAll(filePath);
+        this.commitFiles.addAll(commitFiles);
     }
 }
