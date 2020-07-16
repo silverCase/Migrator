@@ -8,7 +8,9 @@ public class RepoLibrary {
     public boolean isRemoved;
     public String pomPath;
 
-    public RepoLibrary(final String repoLink, final String commitID, final String libraryName,
+    public RepoLibrary(final String repoLink,
+                       final String commitID,
+                       final String libraryName,
                        final boolean isAdded,
                        final boolean isRemoved,
                        final String pomPath) {

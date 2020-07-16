@@ -17,6 +17,7 @@ import storage.Repository;
 
 public class CollectingGitCommitsThenFillingUpRepositoriesAndRepoCommitsAndRepoLibrariesInMemoryStorageWithData {
     public static void main(String[] args) throws IOException, InterruptedException, JDOMException {
+        System.out.println("step 1 started");
         List<String> listOfGitRepoLinks =  CsvWithGitRepoLinks.listOfLinks();
         List<String> allLinks = MemoryStorage.gitRepoLinks; // ???
         for (String gitRepoLink: listOfGitRepoLinks) {
@@ -51,7 +52,7 @@ public class CollectingGitCommitsThenFillingUpRepositoriesAndRepoCommitsAndRepoL
                     System.out.println(pomPath.firstFile + "==>" + previousVersionsOfLibraries);
                 }
             }
-            System.out.println("ok");
+            System.out.println("step 1 finished");
         }
     }
 }
