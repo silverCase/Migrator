@@ -5,36 +5,91 @@ import java.util.List;
 import storage.RepoLibrary;
 
 public class CartesianProduct {
-    public List<CartesianProductObject> repoLibrariesAsCartesianProduct(List<RepoLibrary> firstListOfRepoLibs, List<RepoLibrary> secondListOfRepoLibs) {
-        final List<CartesianProductObject> repoLibrariesAsCartesianProduct;
+    public static List<CartesianProductObject> repoLibrariesAsCartesianProduct(List<RepoLibrary> firstListOfRepoLibs, List<RepoLibrary> secondListOfRepoLibs) {
+        final List<CartesianProductObject> repoLibrariesAsCartesianProductObjects = new ArrayList<>();
         List<RepoLibrary> secondListOfRepoLibsTmp = new ArrayList<>(secondListOfRepoLibs);
         List<RepoLibrary> firstListOfRepoLibsTmp = new ArrayList<>(firstListOfRepoLibs);
         for (RepoLibrary secondRepoLibrary: secondListOfRepoLibsTmp) {
             for (RepoLibrary firstRepoLibrary: firstListOfRepoLibsTmp) {
-                // continue;
+                if (isUpgradeProcess(firstRepoLibrary.libraryName, secondRepoLibrary.libraryName)) {
+                    secondListOfRepoLibsTmp.remove(firstRepoLibrary);
+                    secondListOfRepoLibsTmp.remove(secondRepoLibrary);
+                }
             }
         }
-        return null;
+        for (RepoLibrary secondRepoLibrary: secondListOfRepoLibsTmp) {
+            for (RepoLibrary firstRepoLibrary: firstListOfRepoLibsTmp) {
+                if (isUpgradeProcess(firstRepoLibrary.libraryName, secondRepoLibrary.libraryName)) {
+                    firstRepoLibrary.libraryName = libraryNameWithoutVersion(firstRepoLibrary.libraryName);
+                    secondRepoLibrary.libraryName = libraryNameWithoutVersion(secondRepoLibrary.libraryName);
+                    CartesianProductObject cartesianProduct = new CartesianProductObject(firstRepoLibrary.libraryName, secondRepoLibrary.libraryName);
+                    int cartesianProductIndex = isFoundCartesianProductObjectUnique(repoLibrariesAsCartesianProductObjects, firstRepoLibrary.libraryName, secondRepoLibrary.libraryName);
+                    if (cartesianProductIndex != -1) {
+                        repoLibrariesAsCartesianProductObjects.get(cartesianProductIndex).frequency += 1;
+                    } else {
+                        repoLibrariesAsCartesianProductObjects.add(cartesianProduct);
+                    }
+                }
+            }
+        }
+        return repoLibrariesAsCartesianProductObjects;
     }
 
-    public static String libraryWithoutVersion(String librarName) {
-
-        String[] AppInfo = librarName.split(":");
-
-        return AppInfo[0] + ":" + AppInfo[1] + ":xxx";
+    private static String libraryNameWithoutVersion(String libraryName) {
+        String[] libraryNameParts = libraryName.split(":");
+        return libraryNameParts[0] + ":" + libraryNameParts[1] + ":xxx";
     }
 
-    public boolean isUpgradeProcess(String libraryName1, String libraryName2) {
+    private static boolean isUpgradeProcess(String firstLibraryName, String secondLibraryName) {
+        String[] firstLibraryNameParts = firstLibraryName.split(":");
+        String[] secondLibraryNameParts = secondLibraryName.split(":");
+        return firstLibraryNameParts[0].trim().startsWith(secondLibraryNameParts[0].trim())
+            || secondLibraryNameParts[0].trim().startsWith(firstLibraryNameParts[0].trim())
+            || firstLibraryNameParts[1].trim().startsWith(secondLibraryNameParts[1].trim())
+            || secondLibraryNameParts[1].trim().startsWith(firstLibraryNameParts[1].trim());
+    }
 
-        String[] librarName1sp = libraryName1.split(":");
-        String[] librarName2sp = libraryName2.split(":");
-        if (librarName1sp[0].trim().startsWith(librarName2sp[0].trim())
-            || librarName2sp[0].trim().startsWith(librarName1sp[0].trim())
-            || librarName1sp[1].trim().startsWith(librarName2sp[1].trim())
-            || librarName2sp[1].trim().startsWith(librarName1sp[1].trim())) {
-            return true;
+    private static int isFoundCartesianProductObjectUnique(List<CartesianProductObject> cartesianProductObjects, String firstLibraryName, String secondLibraryName) {
+        int foundIndex = -1;
+        for (int i = 0; i < cartesianProductObjects.size(); i++) {
+            CartesianProductObject cartesianProductObject = cartesianProductObjects.get(i);
+            if ((cartesianProductObject.firstLibraryName.equals(firstLibraryName) && cartesianProductObject.secondLibraryName.equals(secondLibraryName))) {
+                foundIndex = i;
+                break;
+            }
         }
 
-        return false;
+        return foundIndex;
+    }
+
+    public static List<CartesianProductObject> filteredListOfCartesianProductObjects(List<CartesianProductObject> cartesianProductObjects) {
+
+        for (int i = 0; i < cartesianProductObjects.size(); i++) {
+            CartesianProductObject cpObject1 = cartesianProductObjects.get(i);
+            int maxFrequency = 0;
+            // find the max show times
+            for (CartesianProductObject cpObject2 : cartesianProductObjects) {
+                if (!cpObject2.isCleaned) {
+                    if (cpObject1.firstLibraryName.equals(cpObject2.firstLibraryName) /* || cpObject1.value1.equals(cpObject2.value2) */) {
+                        if (cpObject2.frequency > maxFrequency) {
+                            maxFrequency = cpObject2.frequency;
+                        }
+                    }
+                }
+            }
+            // devide the max show times on other value
+            for (CartesianProductObject cpObject2 : cartesianProductObjects) {
+                if (!cpObject2.isCleaned) {
+                    if (cpObject1.firstLibraryName.equals(cpObject2.firstLibraryName) /* || cpObject1.value1.equals(cpObject2.value2) */) {
+                        // We use 1.0 to convert double to int
+                        cpObject2.accuracy = cpObject2.frequency * 1.0 / maxFrequency
+                            * 1.0;
+                        cpObject2.isCleaned = true;
+                    }
+                }
+            }
+        }
+
+        return cartesianProductObjects;
     }
 }

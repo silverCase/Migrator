@@ -127,7 +127,7 @@ public class GitHub {
                 }
             }
             if (!commitID.isEmpty()) {
-                // printCommitInfo( commitID, developerName, commitDate,commitText,commitFiles);
+                // printCommitInfo( commitId, developerName, commitDate,commitText,commitFiles);
                 listOfCommits.add(new Commit(commitID, developerName, commitDate, commitText, listOfCommitFiles));
             }
         }
@@ -157,5 +157,18 @@ public class GitHub {
             }
         }
         return "";
+    }
+
+    public static boolean areTwoCommitsSequential(String oldCommitId, String newCommitId) {
+        String[] newCommitIdParts = newCommitId.split("_");
+        String[] oldCommitIdParts = oldCommitId.split("_");
+        int newCommitNumber = Integer.parseInt(newCommitIdParts[0].substring(1));
+        int oldCommitNumber = Integer.parseInt(oldCommitIdParts[0].substring(1));
+        if ((newCommitNumber - oldCommitNumber) >= 0) {
+            return true;
+        } else {
+            System.err.println("Missing version=" + (newCommitNumber - oldCommitNumber));
+            return false;
+        }
     }
 }

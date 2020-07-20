@@ -8,4 +8,5 @@ public class MemoryStorage {
     public static List<Repository> repositories = new ArrayList<>();
     public static List<RepoCommit> repoCommits = new ArrayList<>();
     public static List<RepoLibrary> repoLibraries = new ArrayList<>();
+    public static List<MigrationRule> migrationRules = new ArrayList<>();
 }
