@@ -46,7 +46,7 @@ public class CollectingGitCommitsThenFillingUpRepositoriesAndRepoCommitsAndRepoL
                 for (CommitFiles pomPath : commit.commitFiles) {
                     // make sure all commits has init library
                     previousVersionsOfLibraries.putIfAbsent(pomPath.firstFile, "");
-                    String prevCommitLibraries = Pom.generatedRepoLibraries(clonedRepo,pomPath.firstFile, gitRepoLink,
+                    String prevCommitLibraries = Pom.generatedRepoLibraries(clonedRepo, pomPath.firstFile, gitRepoLink,
                         commit.commitID, previousVersionsOfLibraries.get(pomPath.firstFile));
                     previousVersionsOfLibraries.put(pomPath.firstFile, prevCommitLibraries);
                     System.out.println(pomPath.firstFile + "==>" + previousVersionsOfLibraries);

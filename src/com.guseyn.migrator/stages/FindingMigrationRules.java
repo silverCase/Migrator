@@ -43,11 +43,11 @@ public class FindingMigrationRules {
             if (!oldCommitId.equals(repoLibrary.commitId)) {
                 if (listOfAddedRepoLibraries.size() > 0 && listOfRemovedLibraries.size() > 0) {
                     System.out.println("(" + counterForProcessingLibraries + "-" + totalNumberOfRepoLibraries + ")--> Find CP between:" + repoLibrary.commitId + "<==>" + oldCommitId);
-                    if (GitHub.areTwoCommitsSequential(oldCommitId, newCommitId)) {
+                    if (!GitHub.areTwoCommitsSequential(oldCommitId, newCommitId)) {
                         System.err.println("==>This CartesianProductObject is ignored because of incorrect commit order in between");
                         return;
                     } else {
-                        repoLibrariesAsCartesianProduct = CartesianProduct.repoLibrariesAsCartesianProduct(listOfAddedRepoLibraries, listOfRemovedLibraries);
+                        repoLibrariesAsCartesianProduct = CartesianProduct.repoLibrariesAsCartesianProduct(repoLibrariesAsCartesianProduct, listOfAddedRepoLibraries, listOfRemovedLibraries);
                     }
                 }
                 oldCommitId = repoLibrary.commitId;
@@ -61,11 +61,11 @@ public class FindingMigrationRules {
             }
         }
         if (listOfAddedRepoLibraries.size() > 0 && listOfRemovedLibraries.size() > 0) {
-            if (GitHub.areTwoCommitsSequential(oldCommitId, newCommitId)) {
+            if (!GitHub.areTwoCommitsSequential(oldCommitId, newCommitId)) {
                 System.err.println("==>This CartesianProductObject is ignored because of incorrect commit order in between");
                 return;
             } else {
-                repoLibrariesAsCartesianProduct = CartesianProduct.repoLibrariesAsCartesianProduct(listOfAddedRepoLibraries, listOfRemovedLibraries);
+                repoLibrariesAsCartesianProduct = CartesianProduct.repoLibrariesAsCartesianProduct(repoLibrariesAsCartesianProduct, listOfAddedRepoLibraries, listOfRemovedLibraries);
             }
         }
         System.out.println("***** Filtering Cartesian Product *****");
@@ -75,16 +75,16 @@ public class FindingMigrationRules {
         int requiredFrequency = 1;
         int numberOfValidMigrationRules = 0;
         int numberOfValidUpgradeRules = 0;
-        int numbeerOfFalseRules = 0;
+        int numberOfFalseRules = 0;
 
         StringBuilder upgrades = new StringBuilder();
         StringBuilder migrations = new StringBuilder();
 
-        for (CartesianProductObject cartesianProductObject: repoLibrariesAsCartesianProduct) {
+        for (CartesianProductObject cartesianProductObject: filteredCartesianProductObjects) {
             if (cartesianProductObject.accuracy >= requiredThreshold && cartesianProductObject.frequency >= requiredFrequency) {
                 String[] firstLibraryNameParts = cartesianProductObject.firstLibraryName.split(":");
                 String[] secondLibraryNameParts = cartesianProductObject.secondLibraryName.split(":");
-                if (firstLibraryNameParts[0].equals(secondLibraryNameParts[1])) {
+                if (!firstLibraryNameParts[0].equals(secondLibraryNameParts[1])) {
                     migrations.append(cartesianProductObject.firstLibraryName)
                         .append(" <======> ").append(cartesianProductObject.secondLibraryName)
                         .append("\t| frequency:")
@@ -124,7 +124,7 @@ public class FindingMigrationRules {
                     );
                 }
             } else {
-                numbeerOfFalseRules++;
+                numberOfFalseRules++;
             }
         }
         System.out.println("\n**************************************");
@@ -143,7 +143,7 @@ public class FindingMigrationRules {
         System.err.println("With threshold: " + requiredThreshold + "\nTotal Migrations: " + filteredCartesianProductObjects.size()
             + "\nValid Rules:" + (numberOfValidMigrationRules + numberOfValidUpgradeRules) + " (Migration:"
             + numberOfValidMigrationRules + ", Upgrade:" + numberOfValidMigrationRules + ")\nFalse Rules:"
-            + numbeerOfFalseRules);
+            + numberOfFalseRules);
         System.err.println("**************************************\n");
         System.out.println("step 2 finished");
     }

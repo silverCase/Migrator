@@ -1,20 +1,21 @@
 package pom;
 
+import com.guseyn.broken_xml.Element;
+import com.guseyn.broken_xml.ParsedXML;
+import com.guseyn.broken_xml.Text;
+import com.guseyn.broken_xml.XmlDocument;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
+import java.util.stream.Collectors;
 import storage.MemoryStorage;
 import storage.RepoLibrary;
 
 public class Pom {
-    public static String generatedRepoLibraries(String clonedRepo, String pomPath, String repoLink, String commitID, String previousVersionLibraries) throws JDOMException, IOException {
+    public static String generatedRepoLibraries(String clonedRepo, String pomPath, String repoLink, String commitID, String previousVersionLibraries) throws IOException {
         String versionLibraries;
         String absolutePomPath = clonedRepo + "/" + pomPath;
         versionLibraries = deserializedListOfJavaProjectLibraries(absolutePomPath);
@@ -69,7 +70,7 @@ public class Pom {
         return listOfLibrary;
     }
 
-    private static String deserializedListOfJavaProjectLibraries(String projectVersionPath) throws JDOMException, IOException {
+    private static String deserializedListOfJavaProjectLibraries(String projectVersionPath) throws IOException {
         if (projectVersionPath.length() == 0) {
             System.err.println("project does not have pom.xml file");
             return "";
@@ -79,18 +80,16 @@ public class Pom {
 
         File inputFile = new File(projectVersionPath);
         if (inputFile.exists()) {
-            SAXBuilder saxBuilder = new SAXBuilder();
-            Document document = saxBuilder.build(inputFile);
-
-            Element root = document.getRootElement();
+            XmlDocument document = new ParsedXML(file.File.content(projectVersionPath)).document();
+            Element root = document.roots().get(0);
 
             // get public properties for library version
             HashMap<String, String> propertiesList = new HashMap<>();
             Element properties = elementChild(root, "properties");
             if (properties != null) {
-                List<Element> propertiesListNode = properties.getChildren();
+                List<Element> propertiesListNode = properties.children();
                 for (Element property : propertiesListNode) {
-                    propertiesList.put("${" + property.getName() + "}", property.getValue());
+                    propertiesList.put("${" + property.name() + "}", textsAsOneValue(property.texts()));
                 }
             }
 
@@ -104,30 +103,35 @@ public class Pom {
                 dependencies = elementChild(root, "dependencies");
             }
             if (dependencies != null) {
-                List<Element> listOfDependencies = dependencies.getChildren();
+                List<Element> listOfDependencies = dependencies.children();
                 // System.out.println("----------------------------");
 
                 for (Element dependency : listOfDependencies) {
-                    List<Element> librariesList = dependency.getChildren();
+                    List<Element> librariesList = dependency.children();
                     String groupId = "";
                     String artifactId = "";
                     String version = "";
                     for (Element libraryInfo : librariesList) {
-                        if (libraryInfo.getName().equals("groupId")) {
-                            groupId = libraryInfo.getValue();
+                        if (libraryInfo.name().equals("groupId")) {
+                            groupId = textsAsOneValue(libraryInfo.texts());
                         }
-                        if (libraryInfo.getName().equals("artifactId")) {
-                            artifactId = libraryInfo.getValue();
+                        if (libraryInfo.name().equals("artifactId")) {
+                            artifactId = textsAsOneValue(libraryInfo.texts());
                         }
-                        if (libraryInfo.getName().equals("version")) {
-                            version = libraryInfo.getValue();
+                        if (libraryInfo.name().equals("version")) {
+                            version = textsAsOneValue(libraryInfo.texts());
                             if (version.startsWith("${")) {
-                                version = propertiesList.get(version);
+                                if (propertiesList.get(version) != null) {
+                                    if (propertiesList.get(version).contains("-")) {
+                                        System.out.println("ok");
+                                    }
+                                    version = propertiesList.get(version).replace(":", "-");
+                                }
                             }
                         }
                     }
-                    String libraryLink = groupId + ":" + artifactId + ":" + version;
-
+                    version = version.replace(",", ";");
+                    String libraryLink = String.join(":", groupId, artifactId, version);
                     if (versionLibraries.length() == 0) {
                         versionLibraries = new StringBuilder(libraryLink);
                     } else {
@@ -145,9 +149,9 @@ public class Pom {
 
     private static Element elementChild(Element classElement, String name) {
         try {
-            List<Element> studentList = classElement.getChildren();
+            List<Element> studentList = classElement.children();
             for (Element element : studentList) {
-                if (element.getName().equals(name)) {
+                if (element.name().equals(name)) {
                     return element;
                 }
             }
@@ -155,5 +159,9 @@ public class Pom {
             System.out.println("No child found under the name:" + name);
         }
         return null;
+    }
+
+    private static String textsAsOneValue(List<Text> texts) {
+        return texts.stream().map(Text::value).collect(Collectors.joining(""));
     }
 }

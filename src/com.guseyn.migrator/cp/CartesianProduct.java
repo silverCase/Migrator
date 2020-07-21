@@ -5,30 +5,30 @@ import java.util.List;
 import storage.RepoLibrary;
 
 public class CartesianProduct {
-    public static List<CartesianProductObject> repoLibrariesAsCartesianProduct(List<RepoLibrary> firstListOfRepoLibs, List<RepoLibrary> secondListOfRepoLibs) {
-        final List<CartesianProductObject> repoLibrariesAsCartesianProductObjects = new ArrayList<>();
+    public static List<CartesianProductObject> repoLibrariesAsCartesianProduct(List<CartesianProductObject> repoLibrariesAsCartesianProductObjects, List<RepoLibrary> firstListOfRepoLibs, List<RepoLibrary> secondListOfRepoLibs) {
+        if (firstListOfRepoLibs.size() > 100 || secondListOfRepoLibs.size() > 100) {
+            return repoLibrariesAsCartesianProductObjects;
+        }
         List<RepoLibrary> secondListOfRepoLibsTmp = new ArrayList<>(secondListOfRepoLibs);
         List<RepoLibrary> firstListOfRepoLibsTmp = new ArrayList<>(firstListOfRepoLibs);
-        for (RepoLibrary secondRepoLibrary: secondListOfRepoLibsTmp) {
-            for (RepoLibrary firstRepoLibrary: firstListOfRepoLibsTmp) {
+        for (RepoLibrary secondRepoLibrary: secondListOfRepoLibs) {
+            for (RepoLibrary firstRepoLibrary: firstListOfRepoLibs) {
                 if (isUpgradeProcess(firstRepoLibrary.libraryName, secondRepoLibrary.libraryName)) {
-                    secondListOfRepoLibsTmp.remove(firstRepoLibrary);
+                    firstListOfRepoLibsTmp.remove(firstRepoLibrary);
                     secondListOfRepoLibsTmp.remove(secondRepoLibrary);
                 }
             }
         }
         for (RepoLibrary secondRepoLibrary: secondListOfRepoLibsTmp) {
             for (RepoLibrary firstRepoLibrary: firstListOfRepoLibsTmp) {
-                if (isUpgradeProcess(firstRepoLibrary.libraryName, secondRepoLibrary.libraryName)) {
-                    firstRepoLibrary.libraryName = libraryNameWithoutVersion(firstRepoLibrary.libraryName);
-                    secondRepoLibrary.libraryName = libraryNameWithoutVersion(secondRepoLibrary.libraryName);
-                    CartesianProductObject cartesianProduct = new CartesianProductObject(firstRepoLibrary.libraryName, secondRepoLibrary.libraryName);
-                    int cartesianProductIndex = isFoundCartesianProductObjectUnique(repoLibrariesAsCartesianProductObjects, firstRepoLibrary.libraryName, secondRepoLibrary.libraryName);
-                    if (cartesianProductIndex != -1) {
-                        repoLibrariesAsCartesianProductObjects.get(cartesianProductIndex).frequency += 1;
-                    } else {
-                        repoLibrariesAsCartesianProductObjects.add(cartesianProduct);
-                    }
+                firstRepoLibrary.libraryName = libraryNameWithoutVersion(firstRepoLibrary.libraryName);
+                secondRepoLibrary.libraryName = libraryNameWithoutVersion(secondRepoLibrary.libraryName);
+                CartesianProductObject cartesianProduct = new CartesianProductObject(firstRepoLibrary.libraryName, secondRepoLibrary.libraryName);
+                int cartesianProductIndex = isFoundCartesianProductObjectUnique(repoLibrariesAsCartesianProductObjects, firstRepoLibrary.libraryName, secondRepoLibrary.libraryName);
+                if (cartesianProductIndex != -1) {
+                    repoLibrariesAsCartesianProductObjects.get(cartesianProductIndex).frequency += 1;
+                } else {
+                    repoLibrariesAsCartesianProductObjects.add(cartesianProduct);
                 }
             }
         }
@@ -37,12 +37,18 @@ public class CartesianProduct {
 
     private static String libraryNameWithoutVersion(String libraryName) {
         String[] libraryNameParts = libraryName.split(":");
+        if (libraryNameParts.length < 2) {
+            return libraryNameParts[0] + ":xxx";
+        }
         return libraryNameParts[0] + ":" + libraryNameParts[1] + ":xxx";
     }
 
     private static boolean isUpgradeProcess(String firstLibraryName, String secondLibraryName) {
         String[] firstLibraryNameParts = firstLibraryName.split(":");
         String[] secondLibraryNameParts = secondLibraryName.split(":");
+        if (secondLibraryNameParts.length < 2 || firstLibraryNameParts.length < 2) {
+            return false;
+        }
         return firstLibraryNameParts[0].trim().startsWith(secondLibraryNameParts[0].trim())
             || secondLibraryNameParts[0].trim().startsWith(firstLibraryNameParts[0].trim())
             || firstLibraryNameParts[1].trim().startsWith(secondLibraryNameParts[1].trim())
