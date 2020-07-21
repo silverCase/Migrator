@@ -16,7 +16,7 @@ import storage.RepoCommit;
 import storage.Repository;
 
 public class CollectingGitCommitsThenFillingUpRepositoriesAndRepoCommitsAndRepoLibrariesInMemoryStorageWithData {
-    public static void main(String[] args) throws IOException, InterruptedException, JDOMException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("step 1 started");
         List<String> listOfGitRepoLinks =  CsvWithGitRepoLinks.listOfLinks();
         List<String> allLinks = MemoryStorage.gitRepoLinks; // ???
@@ -46,7 +46,7 @@ public class CollectingGitCommitsThenFillingUpRepositoriesAndRepoCommitsAndRepoL
                 for (CommitFiles pomPath : commit.commitFiles) {
                     // make sure all commits has init library
                     previousVersionsOfLibraries.putIfAbsent(pomPath.firstFile, "");
-                    String prevCommitLibraries = Pom.generatedRepoLibraries(clonedRepo,pomPath.firstFile, gitRepoLink,
+                    String prevCommitLibraries = Pom.generatedRepoLibraries(clonedRepo, pomPath.firstFile, gitRepoLink,
                         commit.commitID, previousVersionsOfLibraries.get(pomPath.firstFile));
                     previousVersionsOfLibraries.put(pomPath.firstFile, prevCommitLibraries);
                     System.out.println(pomPath.firstFile + "==>" + previousVersionsOfLibraries);
