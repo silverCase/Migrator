@@ -16,7 +16,7 @@ import storage.RepoCommit;
 import storage.Repository;
 
 public class CollectingGitCommitsThenFillingUpRepositoriesAndRepoCommitsAndRepoLibrariesInMemoryStorageWithData {
-    public static void main(String[] args) throws IOException, InterruptedException, JDOMException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("step 1 started");
         List<String> listOfGitRepoLinks =  CsvWithGitRepoLinks.listOfLinks();
         List<String> allLinks = MemoryStorage.gitRepoLinks; // ???

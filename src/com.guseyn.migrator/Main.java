@@ -4,7 +4,7 @@ import stages.CollectingGitCommitsThenFillingUpRepositoriesAndRepoCommitsAndRepo
 import stages.FindingMigrationRules;
 
 public class Main {
-    public static void main(String[] args) throws IOException, InterruptedException, JDOMException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         CollectingGitCommitsThenFillingUpRepositoriesAndRepoCommitsAndRepoLibrariesInMemoryStorageWithData.main(args);
         FindingMigrationRules.main(args);
         System.out.println("done");
