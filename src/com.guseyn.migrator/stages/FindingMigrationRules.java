@@ -137,14 +137,14 @@ public class FindingMigrationRules {
         System.out.println("**************************************\n");
         System.out.println(upgrades.toString());
 
-        System.err.println("\n**************************************");
-        System.err.println("************* Summary Report **************");
-        System.err.println("**************************************");
-        System.err.println("With threshold: " + requiredThreshold + "\nTotal Migrations: " + filteredCartesianProductObjects.size()
+        System.out.println("\n**************************************");
+        System.out.println("************* Summary Report **************");
+        System.out.println("**************************************");
+        System.out.println("With threshold: " + requiredThreshold + "\nTotal Migrations: " + filteredCartesianProductObjects.size()
             + "\nValid Rules:" + (numberOfValidMigrationRules + numberOfValidUpgradeRules) + " (Migration:"
             + numberOfValidMigrationRules + ", Upgrade:" + numberOfValidMigrationRules + ")\nFalse Rules:"
             + numberOfFalseRules);
-        System.err.println("**************************************\n");
+        System.out.println("**************************************\n");
         System.out.println("step 2 finished");
     }
 }
