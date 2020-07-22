@@ -16,4 +16,14 @@ public class File {
         }
         return content.toString();
     }
+
+    public static String createdFolder(String folderPath) throws InterruptedException, IOException {
+        System.out.println("==> create folder : " + folderPath);
+        String cmdStr = "mkdir -p " + folderPath;
+        System.out.println(cmdStr);
+        Process p = Runtime.getRuntime().exec(new String[] { "bash", "-c", cmdStr });
+        p.waitFor();
+        System.out.println("<== folder is created");
+        return folderPath;
+    }
 }
