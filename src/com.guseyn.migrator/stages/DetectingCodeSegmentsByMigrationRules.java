@@ -27,9 +27,22 @@ public class DetectingCodeSegmentsByMigrationRules {
         String newCommitId = "";
         String oldPomPath = "";
         String repoLink = "";
+        // *********************************************************************
+        // 1- Search for migration using library changes in pom file
+        // *********************************************************************
         for (MigrationRule migrationRule: migrationRules) {
-
+            System.out.println("==> Start search for migration rule " + migrationRule.fromLibraryName + "<==> " + migrationRule.toLibraryName);
+            MigratedLibrary.id = migrationRule.id;
+            String fromValidLibrary = null;
+            String toValidLibrary = null;
+            // List<>
         }
         System.out.println("step 3 finished");
+    }
+
+    private static class MigratedLibrary {
+        public static String fromLibrary;
+        public static String toLibrary;
+        public static String id;
     }
 }
