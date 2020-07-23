@@ -1,17 +1,22 @@
 package storage;
 
+import java.util.UUID;
+
 public class MigrationRule {
-    public String firstLibraryName;
-    public String secondLibraryName;
+    public String id;
+    public String fromLibraryName;
+    public String toLibraryName;
     public int frequency;
     public double accuracy;
     public int isValid;
 
-    public MigrationRule(final String firstLibraryName, final String secondLibraryName,
+    public MigrationRule(final String fromLibraryName,
+                         final String toLibraryName,
                          final int frequency,
                          final double accuracy) {
-        this.firstLibraryName = firstLibraryName;
-        this.secondLibraryName = secondLibraryName;
+        this.id = UUID.randomUUID().toString().replace("-", "");
+        this.fromLibraryName = fromLibraryName;
+        this.toLibraryName = toLibraryName;
         this.frequency = frequency;
         this.accuracy = accuracy;
         this.isValid = 0;
