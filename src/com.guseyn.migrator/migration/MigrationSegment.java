@@ -63,6 +63,10 @@ public class MigrationSegment implements Comparable<MigrationSegment> {
 
     @Override
     public int compareTo(final MigrationSegment o) {
-        return 0;
+        int segmentSize = this.addedCode.size() * this.removedCode.size() - o.addedCode.size() * o.removedCode.size();
+        if (segmentSize == 0) {
+            segmentSize = o.frequency - this.frequency;
+        }
+        return segmentSize;
     }
 }
