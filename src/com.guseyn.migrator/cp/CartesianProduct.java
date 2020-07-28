@@ -98,4 +98,13 @@ public class CartesianProduct {
 
         return cartesianProductObjects;
     }
+
+    public static String foundLibraryNameInListOfLibraries(List<RepoLibrary> libraries, String libraryName) {
+        for (RepoLibrary library : libraries) {
+            if (library.libraryName.contains(libraryName)) {
+                return library.libraryName;
+            }
+        }
+        return "";
+    }
 }
