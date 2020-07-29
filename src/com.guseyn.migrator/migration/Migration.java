@@ -1,14 +1,18 @@
 package migration;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import stages.DetectingCodeSegmentsByMigrationRules;
 import storage.MemoryStorage;
 import storage.MigrationRule;
 
 public class Migration {
+    static String pathClone = Paths.get(".").toAbsolutePath().normalize().toString() + "/Clone/Process/";
+
     public static List<MigrationRule> migrationRulesWithoutVersion(int isValid) {
         List<MigrationRule> migrationRules = MemoryStorage.migrationRules.stream().filter(migrationRule -> migrationRule.isValid == isValid).sorted(
             Comparator.comparingInt(migrationRule -> migrationRule.frequency)).collect(
@@ -23,7 +27,7 @@ public class Migration {
         // list of changed files
         List<String> listOfChangedFiles = cloneMigratedCommits(repoLink, previousCommitName, migrateAtCommitName);
         if (listOfChangedFiles.size() > 0) {
-            String outputDiffsPath = pathClone + "../Diffs/" + MigratedLibraries.ID + "/" + migrateAtCommitName + "/";
+            String outputDiffsPath = pathClone + "../Diffs/" + DetectingCodeSegmentsByMigrationRules.MigratedLibrary.id + "/" + migrateAtCommitName + "/";
             // list of changed cleaned files
             ArrayList<String> diffsFilePath = generateFragments(listOfChangedFiles, previousCommitName,
                 migrateAtCommitName, outputDiffsPath);
@@ -39,7 +43,7 @@ public class Migration {
 
     // This method responsible for clone two commits that has migration to find file
     // changes between them
-    List<String> cloneMigratedCommits(String repoLink, String previousCommitName, String migrateAtCommitName) {
+    public static  List<String> cloneMigratedCommits(String repoLink, String previousCommitName, String migrateAtCommitName) {
         List<String> listOfChangedFiles = new ArrayList<String>();
 
         // Download The library Jar signatures
@@ -93,7 +97,7 @@ public class Migration {
     }
 
     // This function will generate fragments of code changes
-    ArrayList<String> generateFragments(ArrayList<String> listOfChangedFiles, String previousCommitName,
+    public static ArrayList<String> generateFragments(List<String> listOfChangedFiles, String previousCommitName,
                                         String migrateAtCommitName, String outputDiffsPath) {
 
         // list of diffs files path
