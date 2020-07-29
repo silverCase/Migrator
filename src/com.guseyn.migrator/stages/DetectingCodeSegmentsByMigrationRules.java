@@ -104,7 +104,7 @@ public class DetectingCodeSegmentsByMigrationRules {
         System.out.println("step 3 finished");
     }
 
-    private static class MigratedLibrary {
+    public static class MigratedLibrary {
         public static String fromLibrary;
         public static String toLibrary;
         public static String id;
