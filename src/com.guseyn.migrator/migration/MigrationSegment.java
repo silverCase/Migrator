@@ -61,6 +61,15 @@ public class MigrationSegment implements Comparable<MigrationSegment> {
         this.frequency = 1;
     }
 
+    public void addFileName(String filePath) {
+        if (filePath.contains("/")) {
+            String[] path = filePath.split("/");
+            filePath = path[path.length - 1];
+            filePath = filePath.replace(".txt", "").replace("diff_", "");
+        }
+        fileName = filePath;
+    }
+
     @Override
     public int compareTo(final MigrationSegment o) {
         int segmentSize = this.addedCode.size() * this.removedCode.size() - o.addedCode.size() * o.removedCode.size();
