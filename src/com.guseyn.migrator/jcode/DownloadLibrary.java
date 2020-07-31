@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 public class DownloadLibrary {
-	// TODO need to update when machine chnage
+	// TODO need to update when machine change
 	public String libraryPath;
 
 	public DownloadLibrary(String pathToSaveJar) {
@@ -82,68 +82,56 @@ public class DownloadLibrary {
 		// TODO: remove jar library and tfs files
 	}
 
-	// TODO: continue from here
 	// Download Library from URL
-	public void download(String LibraryInfo, boolean isDocs) {
+	public void download(String libraryInfo, boolean isDocs) throws InterruptedException, IOException {
 		// we already have the library
-		if (isLibraryFound(LibraryInfo)) {
-			System.out.println(" Good! library signature (" + LibraryInfo + ") already there donot need to download");
+		if (isLibraryFound(libraryInfo)) {
+			System.out.println(" Good! library signature (" + libraryInfo + ") already there donot need to download");
 			return;
 		}
-		String[] LibraryInfos = LibraryInfo.split(":");
-		if (LibraryInfos.length < 3) {
-			System.err.println(" Error in library name (" + LibraryInfo + ")");
-
+		String[] libraryInfoParts = libraryInfo.split(":");
+		if (libraryInfoParts.length < 3) {
+			System.err.println(" Error in library name (" + libraryInfo + ")");
 			return;
 		}
-		String DgroupId = LibraryInfos[0];
-		String DartifactId = LibraryInfos[1];
-		String Dversion = LibraryInfos[2];
+		String groupId = libraryInfoParts[0];
+		String artifactId = libraryInfoParts[1];
+		String version = libraryInfoParts[2];
 
-		String cmdStr="cd "+ libraryPath + " && curl -L -O http://search.maven.org/remotecontent?filepath="+DgroupId.replace(".", "/")
-		+"/"+DartifactId +"/"+ Dversion+ "/"+ DartifactId+"-"+
-		Dversion+(isDocs?"-javadoc":"")+".jar";
+		String cmdStr="cd "+ libraryPath + " && curl -L -O http://search.maven.org/remotecontent?filepath=" + groupId.replace(".", "/")
+		+ "/" + artifactId + "/" + version+ "/" + artifactId + "-" + version + (isDocs?"-javadoc":"") + ".jar";
 		// String cmdStr = "cd " + libraryPath + " &&  curl -L -O http://central.maven.org/maven2/"
 		// 		+ DgroupId.replace(".", "/") + "/" + DartifactId + "/" + Dversion + "/" + DartifactId + "-" + Dversion
 		// 		+ (isDocs ? "-javadoc" : "") + ".jar";
 		System.out.println(cmdStr);
-		try {
-			System.out.println("==> Start Download " + DartifactId + " library......");
-			Process p = Runtime.getRuntime().exec(new String[] { "bash", "-c", cmdStr });
-			if(!p.waitFor(5, TimeUnit.MINUTES)) {
-			    //timeout - kill the process. 
-			    p.destroy(); 
-			}
-			System.out.println("<== Download completed: ");
-			// buildTFfiles(LibraryInfo,pathToSaveLibrary);
-		} catch (Exception e) {
-			// TODO: handle exception
+		System.out.println("==> Start Download " + artifactId + " library......");
+		Process p = Runtime.getRuntime().exec(new String[] { "bash", "-c", cmdStr });
+		if(!p.waitFor(5, TimeUnit.MINUTES)) {
+			//timeout - kill the process.
+			p.destroy();
 		}
+		System.out.println("<== Download completed: ");
 	}
 
 	// Convert java.jar to source code so we could get signatures
-	public void buildTFfiles(String LibraryInfo) {
-		String[] LibraryInfos = LibraryInfo.split(":");
-		if (LibraryInfos.length < 3) {
-			System.err.println(" Error in library name (" + LibraryInfo + ")");
+	public void buildTFfiles(String libraryInfo) throws IOException, InterruptedException {
+		String[] libraryInfoParts = libraryInfo.split(":");
+		if (libraryInfoParts.length < 3) {
+			System.err.println(" Error in library name (" + libraryInfo + ")");
 			return;
 		}
 		// String DgroupId=LibraryInfos[0];
-		String DartifactId = LibraryInfos[1];
-		String Dversion = LibraryInfos[2];
-		String libraryName = DartifactId + "-" + Dversion + ".jar";
-		try {
-			String cmdStr = "jar -tf " + libraryPath + "/" + libraryName + ">>" + libraryPath + "/tfs/" + libraryName + ".txt";
-			System.out.println("==> generate tfs....");
-			Process p = Runtime.getRuntime().exec(new String[] { "bash", "-c", cmdStr });
-			if(!p.waitFor(5, TimeUnit.MINUTES)) {
-			    //timeout - kill the process. 
-			    p.destroy();  
-			}
-			System.out.println("<== Process completed: ");
-			isLibraryValidToGenerateSignatures(libraryName);
-		} catch (Exception e) {
-			// TODO: handle exception
+		String artifactId = libraryInfoParts[1];
+		String version = libraryInfoParts[2];
+		String libraryName = artifactId + "-" + version + ".jar";
+		String cmdStr = "jar -tf " + libraryPath + "/" + libraryName + ">>" + libraryPath + "/tfs/" + libraryName + ".txt";
+		System.out.println("==> generate tfs....");
+		Process p = Runtime.getRuntime().exec(new String[] { "bash", "-c", cmdStr });
+		if(!p.waitFor(5, TimeUnit.MINUTES)) {
+			//timeout - kill the process.
+			p.destroy();
 		}
+		System.out.println("<== Process completed: ");
+		isLibraryValidToGenerateSignatures(libraryName);
 	}
 }

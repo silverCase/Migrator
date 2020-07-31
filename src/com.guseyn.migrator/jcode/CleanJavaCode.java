@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import migration.MigrationSegment;
+import stages.DetectingCodeSegmentsByMigrationRules;
 
 public class CleanJavaCode {
 	ClassStructure classStructure = new ClassStructure();
@@ -21,7 +22,7 @@ public class CleanJavaCode {
 	}
 
 	// get all segment that found in one project
-	public List<MigrationSegment> listOfCleanedFiles(String path, ArrayList<String> diffsFilePath) throws IOException, InterruptedException {
+	public List<MigrationSegment> listOfCleanedFiles(String path, List<String> diffsFilePath) throws IOException, InterruptedException {
 		System.out.println("\n**************** Start cleanning file from Java code **************");
 		List<MigrationSegment> segmentList = new ArrayList<>();
 		for (String diffPath : diffsFilePath) {
@@ -80,15 +81,20 @@ public class CleanJavaCode {
 
 		List<MigrationSegment> listOfBlocks = new ArrayList<>();
 
-		List<String> listOfAddLibraryClassesName = classStructure.libraryClasses(MigratedLibraries.toLibrary);
+		List<String> listOfAddLibraryClassesName = classStructure.libraryClasses(
+            DetectingCodeSegmentsByMigrationRules.MigratedLibrary.toLibrary);
 		List<String> listOfRemovedLibraryClassesName = classStructure
-				.libraryClasses(MigratedLibraries.fromLibrary);
+				.libraryClasses(DetectingCodeSegmentsByMigrationRules.MigratedLibrary.fromLibrary);
 		List<String> listOfAllClassesNames = new ArrayList<>();
 		listOfAllClassesNames.addAll(listOfAddLibraryClassesName);
 		listOfAllClassesNames.addAll(listOfRemovedLibraryClassesName);
 		HashMap<String, String> listOfClassInstances = listOfLibraryClassesInstance(listOfAllClassesNames, diffFilePath);
-		List<String> listOfAllRemovedStaticMethod = classStructure.staticMethods(MigratedLibraries.fromLibrary);
-		List<String> listOfAllAddedStaticMethod = classStructure.staticMethods(MigratedLibraries.toLibrary);
+		List<String> listOfAllRemovedStaticMethod = classStructure.staticMethods(
+            DetectingCodeSegmentsByMigrationRules.MigratedLibrary.fromLibrary
+        );
+		List<String> listOfAllAddedStaticMethod = classStructure.staticMethods(
+            DetectingCodeSegmentsByMigrationRules.MigratedLibrary.toLibrary
+        );
 		// This will hold previous segment to
 		// catch case when complete block removed and complete block is removed
 		// TODO: we need to add ability to read method that's on multi line
@@ -247,7 +253,7 @@ public class CleanJavaCode {
 	// We know the block is good it it has added and removed lines
 	MigrationSegment isGoodBlock(
 	    List<String> blockOfChunks, HashMap<String, String> listOfClassesInstances,
-        List<String> listOfAddLibraryClassesName, List<String> listOfRemovedLibraryClassesName) {
+        List<String> listOfAddLibraryClassesName, List<String> listOfRemovedLibraryClassesName) throws IOException {
 
 		List<String> blockOfChainingChunks = new ArrayList<>();
 
@@ -335,7 +341,9 @@ public class CleanJavaCode {
                         cleanLine.trim()
                     );
                     // convert function name to signature
-                    Translate translate = new Translate(MigratedLibraries.toLibrary);
+                    Translate translate = new Translate(
+                        DetectingCodeSegmentsByMigrationRules.MigratedLibrary.toLibrary
+                    );
                     String signature = "";
                     int equalIndex = junText.indexOf("=");
                     if (equalIndex > 0) {
@@ -376,7 +384,9 @@ public class CleanJavaCode {
                         cleanLine.trim()
                     );
                     // convert function name to signature
-                    Translate translate = new Translate(MigratedLibraries.fromLibrary);
+                    Translate translate = new Translate(
+                        DetectingCodeSegmentsByMigrationRules.MigratedLibrary.fromLibrary
+                    );
                     String signature = "";
                     int equalIndex = junText.indexOf("=");
                     if (equalIndex > 0) {
@@ -405,12 +415,10 @@ public class CleanJavaCode {
             } else {
                 blockOfSignatureJunks.add(junText);
             }
-
         }
 
 		// check if it valid chunk has to have hasAddCode=true,hasRemoveCode=true
 		if ((segment.addedCode.size() > 0 && segment.removedCode.size() > 0)) {
-			// segment.blockCode.addAll(blockOfJunck);
 			segment.blockCode.addAll(blockOfSignatureJunks);
 
 		} else {
@@ -418,8 +426,6 @@ public class CleanJavaCode {
 			segment.removedCode.clear();
 			segment.addedCode.clear();
 		}
-
-		// Segment segment = new Segment(blockOfChunk,countAddLines,countRemovedLines);
 		return segment;
 	}
 
@@ -431,7 +437,7 @@ public class CleanJavaCode {
 		if (equalIndex > 0) {
 
 			/*
-			 * In case he use instace from class like 'metaData' use instance of control <
+			 * In case he use instance from class like 'metaData' use instance of control <
 			 * IMocksControl control = EasyMock.createStrictControl(); < DatabaseMetaData
 			 * metaData = control.createMock(DatabaseMetaData.class);
 			 */
@@ -457,15 +463,15 @@ public class CleanJavaCode {
 				}
 			}
 
-			String varaibleDefine = lineCode.substring(0, equalIndex).trim();
+			String variableDefinition = lineCode.substring(0, equalIndex).trim();
 
 			// line has new class instance like (final int age=12)
 			if (className.isEmpty()) {
 				// ex--> final int age
-				int spaceIndex = varaibleDefine.lastIndexOf(" ");
+				int spaceIndex = variableDefinition.lastIndexOf(" ");
 				if (spaceIndex > 0) {
 					// ex--> final int
-					String define = varaibleDefine.substring(0, spaceIndex).trim();
+					String define = variableDefinition.substring(0, spaceIndex).trim();
 					spaceIndex = define.lastIndexOf(" ");
 					// ex--> int
 					if (spaceIndex > 0) {
@@ -480,7 +486,7 @@ public class CleanJavaCode {
 				// check if it class instance has been initialized here
 				// ex--> age=12
 				for (String classInstance : listOfClassesInstances.keySet()) {
-					if (varaibleDefine.equals(classInstance)) {
+					if (variableDefinition.equals(classInstance)) {
 						className = listOfClassesInstances.get(classInstance);
 						break;
 					}
@@ -561,19 +567,19 @@ public class CleanJavaCode {
 		ClassObjInfo classObjInfo = new ClassObjInfo();
 		classObjInfo.instanceName = null;
 		classObjInfo.className = null;
-		// in case define and initiailize the instance
+		// in case define and initialize the instance
 		int hasEqual = line.indexOf("=");
-		int hasbraket = line.indexOf("(");
-		if (hasEqual > 0 && hasEqual < hasbraket) {
+		int hasBracket = line.indexOf("(");
+		if (hasEqual > 0 && hasEqual < hasBracket) {
 
 			String instanceSide = line.substring(0, hasEqual).trim();
 			int hasspace = instanceSide.lastIndexOf(" ");
 			if (hasspace > 0) {
-				classObjInfo.instanceName = instanceSide.substring(hasspace + 1, instanceSide.length()).trim();
+				classObjInfo.instanceName = instanceSide.substring(hasspace + 1).trim();
 				String classNameInfo = instanceSide.substring(0, hasspace).trim();
 				hasspace = classNameInfo.lastIndexOf(" ");
 				if (hasspace > 0) {
-					classObjInfo.className = classNameInfo.substring(hasspace + 1, classNameInfo.length()).trim();
+					classObjInfo.className = classNameInfo.substring(hasspace + 1).trim();
 				} else {
 					classObjInfo.className = classNameInfo;
 				}

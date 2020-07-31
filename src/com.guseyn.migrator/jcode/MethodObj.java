@@ -1,18 +1,19 @@
 package jcode;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MethodObj implements Comparable<MethodObj> {
 	public String returnType;
 	public String methodName;
-	public ArrayList<String> inputParam;
+	public List<String> inputParam;
 	public String scope;
 	public String fullMethodName;
 	public String packageName;
 	public Double frequency;
 
 	public MethodObj(String returnType, String methodName, String scope) {
-		inputParam = new ArrayList<String>();
+		inputParam = new ArrayList<>();
 		this.returnType = returnType;
 		this.methodName = methodName;
 		this.scope = scope;
@@ -20,7 +21,7 @@ public class MethodObj implements Comparable<MethodObj> {
 	}
 
 	public MethodObj() {
-		inputParam = new ArrayList<String>();
+		inputParam = new ArrayList<>();
 		this.returnType = "";
 		this.methodName = "";
 		this.scope = "";
@@ -34,7 +35,7 @@ public class MethodObj implements Comparable<MethodObj> {
 	public String getInputParamAsString() {
 		String inputParams = "";
 		for (String param : inputParam) {
-			if (inputParams == "") {
+			if (inputParams.isEmpty()) {
 				inputParams = param;
 			} else {
 				inputParams = inputParams + "," + param;
@@ -48,8 +49,8 @@ public class MethodObj implements Comparable<MethodObj> {
 	}
 
 	// TODO: need to be able to process method like sum({1,2,3})
-	// This function recive line of code and return method signture
-	public static MethodObj GenerateSignature(String lineCode) {
+	// This function receive line of code and return method signature
+	public static MethodObj generatedSignature(String lineCode) {
 		lineCode = lineCode.trim();
 		MethodObj methodObj = new MethodObj();
 		// find index of input param
@@ -84,7 +85,7 @@ public class MethodObj implements Comparable<MethodObj> {
 			if (returnTypeWithDefine.indexOf(" ") > 0) {
 				int startReturnTypeIndex = returnTypeWithDefine.lastIndexOf(" ");
 				methodObj.returnType = returnTypeWithDefine
-						.substring(startReturnTypeIndex + 1, returnTypeWithDefine.length()).trim();
+						.substring(startReturnTypeIndex + 1).trim();
 				// find scope
 				methodObj.scope = lineCode.substring(0, startReturnTypeIndex).trim();
 			} else {
@@ -94,8 +95,8 @@ public class MethodObj implements Comparable<MethodObj> {
 			methodObj.methodName = nameWithDefine;
 		}
 		// check if their is static instance
-		methodObj.packageName = getPackageName(methodObj.methodName);
-		methodObj.methodName = removeDot(methodObj.methodName);
+		methodObj.packageName = packageName(methodObj.methodName);
+		methodObj.methodName = getMethodNameWithoutPackage(methodObj.methodName);
 
 		methodObj.fullMethodName = lineCode;
 
@@ -108,20 +109,18 @@ public class MethodObj implements Comparable<MethodObj> {
 	}
 
 	// Get name without packages
-	public static String removeDot(String name) {
-
-		// remove donts it it found
+	public static String getMethodNameWithoutPackage(String name) {
+		// remove dots if it's found
 		if (name.contains(".")) {
 			int lastDotIndex = name.lastIndexOf(".");
-			name = name.substring(lastDotIndex + 1, name.length()).trim();
+			name = name.substring(lastDotIndex + 1).trim();
 		}
 		return name;
 	}
 
 	// Get name without packages
-	public static String getPackageName(String name) {
-
-		// remove donts it it found
+	public static String packageName(String name) {
+		// remove dots if it's found
 		if (name.contains(".")) {
 			int lastDotIndex = name.lastIndexOf(".");
 			name = name.substring(0, lastDotIndex).trim();
@@ -129,24 +128,6 @@ public class MethodObj implements Comparable<MethodObj> {
 			name = "";
 		}
 		return name;
-	}
-
-	// Get name without packages
-	public String getMethodNameWithoutPackage() {
-		String name = this.methodName;
-		// remove donts it it found
-		if (name.contains(".")) {
-			int lastDotIndex = name.lastIndexOf(".");
-			name = name.substring(lastDotIndex + 1, name.length()).trim();
-		}
-		return name;
-	}
-
-	public static void main(String[] args) {
-
-		MethodObj methodObj = GenerateSignature("public static LogicalOperator valueOf(long.n name)");
-		MethodObj methodObj1 = GenerateSignature("public static LogicalOperator valueOf(log.java.string name)");
-		System.out.println(methodObj.inputParamDataType(methodObj1));
 	}
 
 	public boolean inputParamCompare(MethodObj otherMethodObj) {
@@ -160,13 +141,13 @@ public class MethodObj implements Comparable<MethodObj> {
 		 * in case we compare with '...' that could have any number of param public
 		 * static void verify(java.lang.Object...);
 		 */
-		if (isEqual == false && countOfInputParam() == 1) {
+		if (!isEqual && countOfInputParam() == 1) {
 			if (this.inputParam.get(0).endsWith("...")) {
 				isEqual = true;
 			}
 		}
 
-		if (isEqual == false && otherMethodObj.countOfInputParam() == 1) {
+		if (!isEqual && otherMethodObj.countOfInputParam() == 1) {
 			if (otherMethodObj.inputParam.get(0).endsWith("...")) {
 				isEqual = true;
 			}
@@ -185,32 +166,19 @@ public class MethodObj implements Comparable<MethodObj> {
 		}
 
 		int countOfParams = 0;
-		// System.out.println(this.fullMethodName +"<===>"+
-		// otherMethodObj.fullMethodName);
-		// System.out.println(this.inputParam);
-		ArrayList<String> listOfMyParams = new ArrayList<String>();
-		listOfMyParams.addAll(this.inputParam);
+		ArrayList<String> listOfMyParams = new ArrayList<>(this.inputParam);
 
-		ArrayList<String> listOfOtherParams = new ArrayList<String>();
-		listOfOtherParams.addAll(otherMethodObj.inputParam);
+		ArrayList<String> listOfOtherParams = new ArrayList<>(otherMethodObj.inputParam);
 
-		// System.out.println(otherMethodObj.inputParam);
-		for (int i = 0; i < listOfMyParams.size(); i++) {
-			String meDataType = listOfMyParams.get(i).trim();
-			String[] inputPramaSp = meDataType.split(" ");
-			meDataType = inputPramaSp[0];
-			// System.out.println("==>"+ inputPramaSp.length);
-			if (meDataType.contains(".")) {
-				String[] inputPramaOtherSp = meDataType.split("\\.");
-				meDataType = inputPramaOtherSp[inputPramaOtherSp.length - 1];
+		for (String listOfMyParam : listOfMyParams) {
+			String methodDataType = listOfMyParam.trim();
+			String[] inputParamParts = methodDataType.split(" ");
+			methodDataType = inputParamParts[0];
+			if (methodDataType.contains(".")) {
+				String[] otherInputParamParts = methodDataType.split("\\.");
+				methodDataType = otherInputParamParts[otherInputParamParts.length - 1];
 
 			}
-			// System.out.println("=="+ meDataType);
-			// System.out.println(meDataType);
-			if (inputPramaSp.length < 1) {
-				continue;
-			}
-			// System.out.println(inputPramaSp[0]);
 			for (int j = 0; j < listOfOtherParams.size(); j++) {
 
 				String[] inputPramaOtherSp = listOfOtherParams.get(j).trim().split("\\s+");
@@ -220,23 +188,13 @@ public class MethodObj implements Comparable<MethodObj> {
 					inputPramaOtherSp = otherDataType.split("\\.");
 					otherDataType = inputPramaOtherSp[inputPramaOtherSp.length - 1];
 				}
-				// System.out.println("=="+ meDataType);
-				// System.out.println("=="+ otherDataType);
-				// System.out.println(otherDataType);
-				// if(inputPramaOtherSp.length<1){ continue;}
-				// System.out.println(inputPramaOtherSp[inputPramaOtherSp.length-1] +"="+
-				// inputPramaSp[0]);
-				if (otherDataType.toLowerCase().startsWith(meDataType.toLowerCase())) {
+				if (otherDataType.toLowerCase().startsWith(methodDataType.toLowerCase())) {
 					listOfOtherParams.remove(j);
 					countOfParams++;
 					break;
 				}
 			}
 		}
-		// System.out.println(countOfParams);
-		// System.out.println((countOfParams == otherMethodObj.inputParam.size())
-		// &&(countOfParams == this.inputParam.size()));
-
 		return (countOfParams == otherMethodObj.inputParam.size()) && (countOfParams == this.inputParam.size());
 	}
 
@@ -281,7 +239,7 @@ public class MethodObj implements Comparable<MethodObj> {
 		// in case they have same number of param
 		if (this.countOfInputParam() == otherMethodObj.countOfInputParam()) {
 			for (int i = 0; i < this.countOfInputParam(); i++) {
-				if (this.inputParam.get(i) != otherMethodObj.inputParam.get(i)) {
+				if (!this.inputParam.get(i).equals(otherMethodObj.inputParam.get(i))) {
 					isEqual = false;
 					break;
 				}
@@ -295,46 +253,23 @@ public class MethodObj implements Comparable<MethodObj> {
 
 	/*
 	 * see if two methods has good match To have excellent match they should be
-	 * similar in number of params and not abstruct
+	 * similar in number of params and not abstract
 	 */
 	boolean hasGoodMatch(String functionSignature) {
 		boolean hasGoodMatch = true;
-		// We prefer method name over abstruct name,if we cannot find method we will use
-		// abstruct
-		if (functionSignature.contains("abstract ") == false) {
+		// We prefer method name over abstract name,if we cannot find method we will use
+		// abstract
+		if (!functionSignature.contains("abstract ")) {
 			hasGoodMatch = false;
 		}
 
-		if (hasGoodMatch == true && this.countOfInputParam() == 1) {
+		if (hasGoodMatch && this.countOfInputParam() == 1) {
 			if (this.inputParam.get(0).endsWith("...")) {
 				hasGoodMatch = false;
 			}
 		}
 
 		return hasGoodMatch;
-	}
-
-	public void print() {
-		System.out.println(this.fullMethodName);
-		System.out.println("Method Name: " + this.methodName);
-		System.out.println("Return Type: " + this.returnType);
-		if (this.scope.length() > 0) {
-			// TODO: return this System.out.println("Scope: "+this.scope);
-		}
-
-		if (this.packageName.length() > 0) {
-			System.out.println("Package Name: " + this.packageName);
-		}
-
-		int index = 1;
-		for (String param : this.inputParam) {
-			System.out.println("Input Params(" + (index++) + ")==> " + param);
-		}
-		if (this.inputParam.size() > 0) {
-			System.out.println("All input Params: " + getInputParamAsString());
-		}
-
-		System.out.println("-------------------------");
 	}
 
 	public int compareTo(MethodObj o) {
