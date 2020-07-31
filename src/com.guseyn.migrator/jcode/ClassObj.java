@@ -61,7 +61,7 @@ public class ClassObj {
 	}
 
 	public void addMethod(String lineCode) {
-		MethodObj methodObj = MethodObj.GenerateSignature(lineCode);
+		MethodObj methodObj = MethodObj.generatedSignature(lineCode);
 		if (methodObj != null) {
 			classMethods.add(methodObj);
 		}

@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import jcode.CleanJavaCode;
 import migration.Migration;
 import migration.MigrationSegment;
 import storage.MemoryStorage;
@@ -16,6 +17,8 @@ import storage.RepoCommit;
 import storage.RepoLibrary;
 
 public class DetectingCodeSegmentsByMigrationRules {
+    CleanJavaCode cleanJavaCode = new CleanJavaCode();
+
     public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("step 3 started");
         final String logFileNameWithCommits = "commits.txt";

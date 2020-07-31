@@ -4,8 +4,11 @@ import com.guseyn.broken_xml.ParsedXML;
 import file.File;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +41,23 @@ public class GitHub {
         return pathToClone;
     }
 
+    public static String copiedRepo(String pathOfFolderWithClones, String repoName, String newCopyName) throws InterruptedException, IOException {
+        System.out.println("==> Start copy: " + repoName + ", to:" + newCopyName);
+        String cmdStr = "cd " + pathOfFolderWithClones + " && cp -r " + repoName + " " + newCopyName;
+        Process p = Runtime.getRuntime().exec(new String[] { "bash", "-c", cmdStr });
+        p.waitFor();
+        System.out.println("<== copy done");
+        return newCopyName;
+    }
+
+    public static void deleteFolder(String folderPath) throws InterruptedException, IOException {
+        System.out.println("==> Start deleting ...");
+        String cmdStr = " rm -rf " + folderPath + "";
+        Process p = Runtime.getRuntime().exec(new String[] { "bash", "-c", cmdStr });
+        p.waitFor();
+        System.out.println("<== Complete delete");
+    }
+
     public static String checkedoutCommit(String repoClonePath, String commitID) throws IOException, InterruptedException {
         if (commitID.contains("_")) {
             String[] commitIDSP = commitID.split("_");
@@ -49,6 +69,15 @@ public class GitHub {
         p.waitFor();
         System.out.println("<== Complete checkout");
         return commitID;
+    }
+
+    // This method find commit id from String
+    public static String commitId(String commitID) {
+        String[] commitParts = commitID.split("_");
+        if (commitParts.length != 2) {
+            return null;
+        }
+        return commitParts[1];
     }
 
     public static String generatedFileWithCommitLogs(String pathToClone, String repoName) throws IOException, InterruptedException {
@@ -172,5 +201,33 @@ public class GitHub {
         }
     }
 
-   // public static String
+    public static boolean doesRepoExist(String repoName) {
+        String pathOfFolderWithClones = Paths.get(".").toAbsolutePath().normalize().toString() + "/Clone/";
+        String repoPath = pathOfFolderWithClones + repoName;
+        return Files.isDirectory(Paths.get(repoPath));
+    }
+
+    // get list of changed files at specific commit
+    public static ArrayList<String> listOfChangedFiles(String pathOfFolderWithClones, String commitId) throws IOException {
+        commitId = commitId(commitId);
+        ArrayList<String> listOfChangedFiles = new ArrayList<String>();
+        String fileWithCommitsPath = pathOfFolderWithClones + "app_commits.txt";
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileWithCommitsPath)));
+        String line;
+        boolean commitInfo = false;
+        while ((line = br.readLine()) != null) {
+            if (commitInfo) {
+                if (line.startsWith("M") && line.endsWith(".java")) {
+                    listOfChangedFiles.add(line.substring(2).trim());
+                }
+            }
+
+            if (commitId != null && line.contains(commitId)) {
+                commitInfo = true;
+            } else if (line.startsWith("commit")) {
+                commitInfo = false;
+            }
+        }
+        return listOfChangedFiles;
+    }
 }
