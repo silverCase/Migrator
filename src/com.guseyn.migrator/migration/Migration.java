@@ -28,10 +28,10 @@ public class Migration {
     }
 
     // This function return list of cleaned segments
-    List<MigrationSegment> startCloning(String appURL, String previousCommitName, String migrateAtCommitName) throws IOException, InterruptedException {
+    public static List<MigrationSegment> startCloning(String repoLink, String previousCommitName, String migrateAtCommitName) throws IOException, InterruptedException {
         List<MigrationSegment> segmentList = new ArrayList<>();
         // list of changed files
-        List<String> listOfChangedFiles = cloneMigratedCommits(appURL, previousCommitName, migrateAtCommitName);
+        List<String> listOfChangedFiles = cloneMigratedCommits(repoLink, previousCommitName, migrateAtCommitName);
         if (listOfChangedFiles.size() > 0) {
             String outputDiffsPath = pathWhereRepoShouldBeCloned + "../Diffs/" + DetectingCodeSegmentsByMigrationRules.MigratedLibrary.id + "/" + migrateAtCommitName + "/";
             // list of changed cleaned files
@@ -48,8 +48,8 @@ public class Migration {
 
     // This method responsible for clone two commits that has migration to find file
     // changes between them
-    ArrayList<String> cloneMigratedCommits(String repoLink, String previousCommitName, String migrateAtCommitName) throws IOException, InterruptedException {
-        ArrayList<String> listOfChangedFiles = new ArrayList<String>();
+    public static List<String> cloneMigratedCommits(String repoLink, String previousCommitName, String migrateAtCommitName) throws IOException, InterruptedException {
+        List<String> listOfChangedFiles = new ArrayList<String>();
 
         // Download The library Jar signatures
         DownloadLibrary downloadLibrary = new DownloadLibrary(pathToSaveJAVALibrary);
@@ -104,7 +104,7 @@ public class Migration {
     }
 
     // This function will generate fragments of code changes
-    List<String> generateFragments(List<String> listOfChangedFiles, String previousCommitName,
+    public static List<String> generateFragments(List<String> listOfChangedFiles, String previousCommitName,
                                    String migrateAtCommitName, String outputDiffsPath) throws IOException, InterruptedException {
         // list of diffs files path
         List<String> diffsFilePath = new ArrayList<>();

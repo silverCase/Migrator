@@ -221,7 +221,6 @@ public class GitHub {
                     listOfChangedFiles.add(line.substring(2).trim());
                 }
             }
-
             if (commitId != null && line.contains(commitId)) {
                 commitInfo = true;
             } else if (line.startsWith("commit")) {
