@@ -191,6 +191,9 @@ public class GitHub {
     public static boolean areTwoCommitsSequential(String oldCommitId, String newCommitId) {
         String[] newCommitIdParts = newCommitId.split("_");
         String[] oldCommitIdParts = oldCommitId.split("_");
+        if (newCommitIdParts.length < 1 || oldCommitIdParts.length < 1 || newCommitIdParts[0].isEmpty() || oldCommitIdParts[0].isEmpty()) {
+            return false;
+        }
         int newCommitNumber = Integer.parseInt(newCommitIdParts[0].substring(1));
         int oldCommitNumber = Integer.parseInt(oldCommitIdParts[0].substring(1));
         if ((newCommitNumber - oldCommitNumber) >= 0) {
