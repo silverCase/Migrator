@@ -83,7 +83,7 @@ public class CartesianProduct {
                     }
                 }
             }
-            // devide the max show times on other value
+            // divide the max show times on other value
             for (CartesianProductObject cpObject2 : cartesianProductObjects) {
                 if (!cpObject2.isCleaned) {
                     if (cpObject1.firstLibraryName.equals(cpObject2.firstLibraryName) /* || cpObject1.value1.equals(cpObject2.value2) */) {
