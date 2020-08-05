@@ -31,16 +31,14 @@ public class FindingMigrationRules {
                 oldRepoLink = repoLibrary.repoLink;
                 listOfAddedRepoLibraries.clear();
                 listOfRemovedLibraries.clear();
-                oldCommitId = "";
                 oldPomPath = "";
             }
-            if (!oldPomPath.equals(repoLibrary.pomPath)) {
-                listOfAddedRepoLibraries.clear();
-                listOfRemovedLibraries.clear();
+            if (oldPomPath.isEmpty()) {
                 oldCommitId = "";
                 oldPomPath = repoLibrary.pomPath;
             }
             if (!oldCommitId.equals(repoLibrary.commitId)) {
+                // System.out.println("commits are not equal");
                 if (listOfAddedRepoLibraries.size() > 0 && listOfRemovedLibraries.size() > 0) {
                     System.out.println("(" + counterForProcessingLibraries + "-" + totalNumberOfRepoLibraries + ")--> Find CP between:" + repoLibrary.commitId + "<==>" + oldCommitId);
                     if (!GitHub.areTwoCommitsSequential(oldCommitId, newCommitId)) {
