@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import org.jdom2.JDOMException;
 import pom.Pom;
 import storage.MemoryStorage;
 import storage.RepoCommit;
@@ -29,7 +28,7 @@ public class CollectingGitCommitsThenFillingUpRepositoriesAndRepoCommitsAndRepoL
             if (repoName.isEmpty()) {
                 continue;
             }
-            String pathWhereRepoShouldBeCloned = Paths.get(".").toAbsolutePath().normalize().toString() + "/clone/";
+            String pathWhereRepoShouldBeCloned = Paths.get(".").toAbsolutePath().normalize().toString() + "/resources/clone/";
             String clonedRepo = GitHub.clonedRepo(pathWhereRepoShouldBeCloned, gitRepoLink) + repoName;
             String fileNameWithLogs = GitHub.generatedFileWithCommitLogs(pathWhereRepoShouldBeCloned, repoName);
             List<Commit> listOfCommits = GitHub.commitsFromLogFile(pathWhereRepoShouldBeCloned);
