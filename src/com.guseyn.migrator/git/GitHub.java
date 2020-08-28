@@ -4,7 +4,6 @@ import com.guseyn.broken_xml.ParsedXML;
 import file.File;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -192,7 +191,7 @@ public class GitHub {
         String[] newCommitIdParts = newCommitId.split("_");
         String[] oldCommitIdParts = oldCommitId.split("_");
         if (newCommitIdParts.length < 1 || oldCommitIdParts.length < 1 || newCommitIdParts[0].isEmpty() || oldCommitIdParts[0].isEmpty()) {
-            return false;
+            return true;
         }
         int newCommitNumber = Integer.parseInt(newCommitIdParts[0].substring(1));
         int oldCommitNumber = Integer.parseInt(oldCommitIdParts[0].substring(1));

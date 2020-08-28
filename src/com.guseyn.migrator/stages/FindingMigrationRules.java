@@ -45,7 +45,7 @@ public class FindingMigrationRules {
                         System.err.println("==>This CartesianProductObject is ignored because of incorrect commit order in between");
                         return;
                     } else {
-                        repoLibrariesAsCartesianProduct = CartesianProduct.repoLibrariesAsCartesianProduct(repoLibrariesAsCartesianProduct, listOfAddedRepoLibraries, listOfRemovedLibraries);
+                        repoLibrariesAsCartesianProduct = CartesianProduct.repoLibrariesAsCartesianProduct(newCommitId, repoLibrariesAsCartesianProduct, listOfAddedRepoLibraries, listOfRemovedLibraries);
                     }
                 }
                 oldCommitId = repoLibrary.commitId;
@@ -63,7 +63,7 @@ public class FindingMigrationRules {
                 System.err.println("==>This CartesianProductObject is ignored because of incorrect commit order in between");
                 return;
             } else {
-                repoLibrariesAsCartesianProduct = CartesianProduct.repoLibrariesAsCartesianProduct(repoLibrariesAsCartesianProduct, listOfAddedRepoLibraries, listOfRemovedLibraries);
+                repoLibrariesAsCartesianProduct = CartesianProduct.repoLibrariesAsCartesianProduct(newCommitId, repoLibrariesAsCartesianProduct, listOfAddedRepoLibraries, listOfRemovedLibraries);
             }
         }
         System.out.println("***** Filtering Cartesian Product *****");
@@ -94,6 +94,7 @@ public class FindingMigrationRules {
                     numberOfValidMigrationRules++;
                     MemoryStorage.migrationRules.add(
                         new MigrationRule(
+                            cartesianProductObject.commitId,
                             cartesianProductObject.firstLibraryName,
                             cartesianProductObject.secondLibraryName,
                             cartesianProductObject.frequency,
@@ -114,6 +115,7 @@ public class FindingMigrationRules {
                     // TODO: return back ????
                     MemoryStorage.migrationRules.add(
                         new MigrationRule(
+                            cartesianProductObject.commitId,
                             cartesianProductObject.firstLibraryName,
                             cartesianProductObject.secondLibraryName,
                             cartesianProductObject.frequency,

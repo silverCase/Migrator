@@ -1,6 +1,7 @@
 package cp;
 
 public class CartesianProductObject {
+    public String commitId;
     public String firstLibraryName;
     public String secondLibraryName;
     public int frequency;
@@ -10,7 +11,8 @@ public class CartesianProductObject {
     public String fromLibVersion;
     public String toLibVersion;
 
-    public CartesianProductObject(final String firstLibraryName, final String secondLibraryName) {
+    public CartesianProductObject(final String commitId, final String firstLibraryName, final String secondLibraryName) {
+        this.commitId = commitId;
         this.firstLibraryName = firstLibraryName;
         this.secondLibraryName = secondLibraryName;
         this.frequency = 1;

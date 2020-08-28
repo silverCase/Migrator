@@ -5,7 +5,7 @@ import java.util.List;
 import storage.RepoLibrary;
 
 public class CartesianProduct {
-    public static List<CartesianProductObject> repoLibrariesAsCartesianProduct(List<CartesianProductObject> repoLibrariesAsCartesianProductObjects, List<RepoLibrary> firstListOfRepoLibs, List<RepoLibrary> secondListOfRepoLibs) {
+    public static List<CartesianProductObject> repoLibrariesAsCartesianProduct(String commitId, List<CartesianProductObject> repoLibrariesAsCartesianProductObjects, List<RepoLibrary> firstListOfRepoLibs, List<RepoLibrary> secondListOfRepoLibs) {
         if (firstListOfRepoLibs.size() > 100 || secondListOfRepoLibs.size() > 100) {
             return repoLibrariesAsCartesianProductObjects;
         }
@@ -23,7 +23,7 @@ public class CartesianProduct {
             for (RepoLibrary firstRepoLibrary: firstListOfRepoLibsTmp) {
                 firstRepoLibrary.libraryName = libraryNameWithoutVersion(firstRepoLibrary.libraryName);
                 secondRepoLibrary.libraryName = libraryNameWithoutVersion(secondRepoLibrary.libraryName);
-                CartesianProductObject cartesianProduct = new CartesianProductObject(firstRepoLibrary.libraryName, secondRepoLibrary.libraryName);
+                CartesianProductObject cartesianProduct = new CartesianProductObject(commitId, firstRepoLibrary.libraryName, secondRepoLibrary.libraryName);
                 int cartesianProductIndex = isFoundCartesianProductObjectUnique(repoLibrariesAsCartesianProductObjects, firstRepoLibrary.libraryName, secondRepoLibrary.libraryName);
                 if (cartesianProductIndex != -1) {
                     repoLibrariesAsCartesianProductObjects.get(cartesianProductIndex).frequency += 1;

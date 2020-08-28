@@ -48,22 +48,17 @@ public class DetectingCodeSegmentsByMigrationRules {
                     listOfAddedLibraries.clear();
                     listOfRemovedLibraries.clear();
                     listOfLibrariesForTheCurrentCommit.clear();
-                    oldCommitId = "";
-                    newCommitId = "";
                     oldPomPath = "";
                 }
-                if (!oldPomPath.equals(library.pomPath)) {
-                    listOfAddedLibraries.clear();
-                    listOfRemovedLibraries.clear();
-                    listOfLibrariesForTheCurrentCommit.clear();
+                if (oldPomPath.isEmpty()) {
                     oldCommitId = "";
                     oldPomPath = library.pomPath;
                 }
                 if (!oldCommitId.equals(newCommitId)) {
                     if (listOfAddedLibraries.size() > 0 || listOfRemovedLibraries.size() > 0) {
-                        if (GitHub.areTwoCommitsSequential(oldCommitId, newCommitId)) {
+                        if (!GitHub.areTwoCommitsSequential(oldCommitId, newCommitId)) {
                             System.err.println("==>This process ignored because of incorrect order of commits in between " + oldCommitId + "==> " + newCommitId);
-                            return;
+                            continue;
                         } else {
                             String foundPreviousLibraryName = CartesianProduct.foundLibraryNameInListOfLibraries(listOfRemovedLibraries, migrationRule.toLibraryName);
                             if (foundPreviousLibraryName.length() > 0) {
